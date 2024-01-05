@@ -141,7 +141,10 @@ export const NewDevicePage = () => {
                   </div>
                 )}
               </div>
-              <IonButton slot="end" onClick={() => setIsOpen(true)}>
+              <IonButton
+                slot="end"
+                onClick={() => setIsOpen(true)}
+                disabled={enabledAPN}>
                 Correct
               </IonButton>
             </IonItem>
