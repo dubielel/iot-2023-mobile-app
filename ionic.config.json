@@ -1,0 +1,7 @@
+{
+  "name": "iot-2023-mobile-app",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "react-vite"
+}

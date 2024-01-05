@@ -1,46 +1,58 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- */
+import { Route } from 'react-router-dom';
+import { App as CapacitorApp } from '@capacitor/app';
+import { IonRouterOutlet, setupIonicReact, useIonRouter } from '@ionic/react';
 
-// import React from 'react';
-import {
-  DarkTheme,
-  DefaultTheme,
-  NavigationContainer,
-} from '@react-navigation/native';
-import { useMemo } from 'react';
-import { useColorScheme } from 'react-native';
-import {
-  MD3DarkTheme,
-  MD3LightTheme,
-  PaperProvider,
-  Text,
-} from 'react-native-paper';
-import { SafeAreaProvider } from 'react-native-safe-area-context';
+/* Core CSS required for Ionic components to work properly */
+import '@ionic/react/css/core.css';
+/* Basic CSS for apps built with Ionic */
+import '@ionic/react/css/normalize.css';
+import '@ionic/react/css/structure.css';
+import '@ionic/react/css/typography.css';
+/* Optional CSS utils that can be commented out */
+import '@ionic/react/css/padding.css';
+import '@ionic/react/css/float-elements.css';
+import '@ionic/react/css/text-alignment.css';
+import '@ionic/react/css/text-transformation.css';
+import '@ionic/react/css/flex-utils.css';
+import '@ionic/react/css/display.css';
+/* Theme variables */
+import './theme/variables.css';
+import { useCallback, useEffect } from 'react';
+import { LoadingScreen } from './LoadingScreen';
+import { HomePage } from './pages/HomePage';
+import { NewDevicePage } from './pages/NewDevicePage';
+import { AddDevicePage } from './pages/AddDevicePage';
+import { ListDevicesPage } from './pages/ListDevicesPage';
+import { DeviceDetailsPage } from './pages/DeviceDetailsPage';
 
-export default function App(): JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
+setupIonicReact({ mode: 'ios', swipeBackEnabled: true });
+const BACK_BUTTON_EVENT_NAME = 'ionBackButton';
 
-  const theme = useMemo(
-    () => (isDarkMode ? MD3DarkTheme : MD3LightTheme),
-    [isDarkMode],
-  );
+export const App = () => {
+  const ionRouter = useIonRouter();
 
-  const navigationTheme = useMemo(
-    () => (isDarkMode ? DarkTheme : DefaultTheme),
-    [isDarkMode],
-  );
+  const backButtonListener = useCallback(() => {
+    if (!ionRouter.canGoBack()) {
+      CapacitorApp.exitApp();
+    }
+  }, [ionRouter]);
+
+  useEffect(() => {
+    document.addEventListener(BACK_BUTTON_EVENT_NAME, backButtonListener);
+
+    return () => {
+      document.removeEventListener(BACK_BUTTON_EVENT_NAME, backButtonListener);
+    };
+  }, [backButtonListener]);
 
   return (
-    <SafeAreaProvider>
-      <PaperProvider theme={theme}>
-        <NavigationContainer theme={navigationTheme}>
-          <Text>Hello, World!</Text>
-        </NavigationContainer>
-      </PaperProvider>
-    </SafeAreaProvider>
+    <IonRouterOutlet>
+      <Route exact path="/" component={LoadingScreen} />
+      <Route path="/home" component={HomePage} />
+      <Route exact path="/device/new" component={NewDevicePage} />
+      <Route exact path="/device/add" component={AddDevicePage} />
+      <Route exact path="/devices" component={ListDevicesPage} />
+      <Route path="/device/details/:id" component={DeviceDetailsPage} />
+    </IonRouterOutlet>
   );
-}
+};

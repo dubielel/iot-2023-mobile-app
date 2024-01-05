@@ -66,3 +66,7 @@ yarn-error.log
 
 # testing
 /coverage
+
+
+# Hidden files
+\.*
