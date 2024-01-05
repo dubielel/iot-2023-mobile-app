@@ -15,12 +15,14 @@
     "generate-assets": "npx @capacitor/assets generate --iconBackgroundColor '#eeeeee' --iconBackgroundColorDark '#222222' --splashBackgroundColor '#eeeeee' --splashBackgroundColorDark '#111111' --android"
   },
   "dependencies": {
+    "@awesome-cordova-plugins/wifi-wizard-2": "^6.6.0",
     "@capacitor/android": "^5.6.0",
     "@capacitor/app": "5.0.6",
     "@capacitor/core": "5.6.0",
     "@capacitor/haptics": "5.0.6",
     "@capacitor/keyboard": "5.0.7",
     "@capacitor/status-bar": "5.0.6",
+    "@hookform/resolvers": "^3.3.4",
     "@ionic/react": "^7.0.0",
     "@ionic/react-router": "^7.0.0",
     "@types/react-router": "^5.1.20",
@@ -32,8 +34,10 @@
     "prettier": "^3.1.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-hook-form": "^7.49.2",
     "react-router": "^5.3.4",
-    "react-router-dom": "^5.3.4"
+    "react-router-dom": "^5.3.4",
+    "zod": "^3.22.4"
   },
   "devDependencies": {
     "@capacitor/cli": "5.6.0",
@@ -43,10 +47,12 @@
     "@testing-library/user-event": "^14.4.3",
     "@types/react": "^18.0.27",
     "@types/react-dom": "^18.0.10",
+    "@typescript-eslint/eslint-plugin": "^6.17.0",
     "@vitejs/plugin-legacy": "^5.0.0",
     "@vitejs/plugin-react": "^4.0.1",
     "eslint": "^8.35.0",
     "eslint-plugin-react": "^7.32.2",
+    "eslint-plugin-react-hooks": "^4.6.0",
     "jsdom": "^22.1.0",
     "terser": "^5.4.0",
     "typescript": "^5.1.6",
