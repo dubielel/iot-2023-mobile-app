@@ -23,6 +23,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { SubmitButton } from '../components/forms/SubmitButton';
 import { WifiSecurityProtocol } from '../utils/WifiSecurityProtocol';
 import { checkmarkOutline } from 'ionicons/icons';
+import { IonLabelRight } from '../components/helpers/IonLabelRight';
 
 const wifiDataValidationSchema = z
   .object({
@@ -62,17 +63,19 @@ export const NewDevicePage = () => {
   const [isLoadingWifis, setIsLoadingWifis] = useState<boolean | null>(null);
   const [availableWifis, setAvailableWifis] = useState<FoundWifiDetails[]>([]);
 
-  const [selectedWifi, setSelectedWifi] = useState<WifiConfig | null>(null);
+  const [selectedWifi, setSelectedWifi] = useState<WifiConfig>({
+    SSID: '',
+    algorithm: WifiSecurityProtocol.None,
+    password: '',
+  });
 
   const [enabledAPN, setEnabledAPN] = useState(false);
 
   const form = useForm<WifiDataForm>({
     mode: 'onChange',
     defaultValues: {
-      SSID: '',
+      ...selectedWifi,
       BSSID: '',
-      algorithm: WifiSecurityProtocol.None,
-      password: '',
     },
     resolver: zodResolver(wifiDataValidationSchema),
   });
@@ -107,7 +110,7 @@ export const NewDevicePage = () => {
             <IonLabel color="dark">
               1. Provide WIFI network configuration to be sent to the device
             </IonLabel>
-            {!selectedWifi ? (
+            {selectedWifi.SSID === '' ? (
               <IonButton slot="end" onClick={() => setIsOpen(true)}>
                 Let&apos;s do it!
               </IonButton>
@@ -117,14 +120,42 @@ export const NewDevicePage = () => {
               </IonBadge>
             )}
           </IonItem>
+          {!(selectedWifi.SSID === '') && (
+            <IonItem>
+              <div style={{ display: 'flex', flexDirection: 'column' }}>
+                <IonLabel>Provided WIFI network configuration:</IonLabel>
+                <div style={{ display: 'flex', flexDirection: 'row' }}>
+                  <IonLabel>SSID:</IonLabel>
+                  <IonLabelRight>{selectedWifi.SSID}</IonLabelRight>
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'row' }}>
+                  <IonLabel>Security protocol:</IonLabel>
+                  <IonLabelRight>{selectedWifi.algorithm}</IonLabelRight>
+                </div>
+                {selectedWifi.password && (
+                  <div style={{ display: 'flex', flexDirection: 'row' }}>
+                    <IonLabel>Password length:</IonLabel>
+                    <IonLabelRight>
+                      {selectedWifi.password.length}
+                    </IonLabelRight>
+                  </div>
+                )}
+              </div>
+              <IonButton slot="end" onClick={() => setIsOpen(true)}>
+                Correct
+              </IonButton>
+            </IonItem>
+          )}
           <IonItem>
             <IonLabel color="dark">2. Click button on the device</IonLabel>
             {!enabledAPN ? (
               <IonButton
                 slot="end"
                 onClick={() => setEnabledAPN(true)}
-                disabled={!selectedWifi}>
-                {!selectedWifi ? 'Do steps before!' : "I've done it!"}
+                disabled={selectedWifi.SSID === ''}>
+                {selectedWifi.SSID === ''
+                  ? 'Do steps before!'
+                  : "I've done it!"}
               </IonButton>
             ) : (
               <IonBadge color="success">
