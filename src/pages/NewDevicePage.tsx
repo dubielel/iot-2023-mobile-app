@@ -14,7 +14,7 @@ import {
   IonSelectOption,
   IonSpinner,
 } from '@ionic/react';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { z } from 'zod';
 import { ScanButton } from '../components/wifi/ScanButton';
 import { AvailableWifiList } from '../components/wifi/AvailableWifiList';
@@ -79,6 +79,17 @@ export const NewDevicePage = () => {
   const { formState, control, setValue, watch, handleSubmit } = form;
   const algorithm = watch('algorithm');
 
+  // DEBUG CODE
+  useEffect(() => {
+    const subscription = watch((value, { name, type }) => {
+      console.log(value, name, type),
+        console.log(wifiDataValidationSchema.safeParse(value));
+    });
+    console.debug(formState);
+    return () => subscription.unsubscribe();
+  }, [watch, formState]);
+  // DEBUG CODE END
+
   return (
     <IonPage>
       {/* <IonHeader>
@@ -109,8 +120,11 @@ export const NewDevicePage = () => {
           <IonItem>
             <IonLabel color="dark">2. Click button on the device</IonLabel>
             {!enabledAPN ? (
-              <IonButton slot="end" onClick={() => setEnabledAPN(true)}>
-                Done
+              <IonButton
+                slot="end"
+                onClick={() => setEnabledAPN(true)}
+                disabled={!selectedWifi}>
+                {!selectedWifi ? 'Do steps before!' : "I've done it!"}
               </IonButton>
             ) : (
               <IonBadge color="success">
