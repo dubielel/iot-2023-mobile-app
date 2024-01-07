@@ -3,11 +3,11 @@ import { ComponentProps, useCallback } from 'react';
 import { FoundWifiDetails } from '../../pages/NewDevicePage';
 import { WifiWizard2 } from '@awesome-cordova-plugins/wifi-wizard-2';
 
-interface ScanButtonProps {
+export type ScanButtonProps = {
   beforeScan: () => void;
   onScanSuccess: (wifis: FoundWifiDetails[]) => void;
   onScanFailure?: (err: unknown) => void;
-}
+};
 
 export const ScanButton = ({
   beforeScan,
