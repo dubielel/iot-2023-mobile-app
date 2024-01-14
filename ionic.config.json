@@ -3,5 +3,11 @@
   "integrations": {
     "capacitor": {}
   },
-  "type": "react-vite"
+  "type": "react-vite",
+  "proxies": [
+    {
+      "path": "/api",
+      "proxyUrl": "https://iot-project-agh-bcdgl.azurewebsites.net"
+    }
+  ]
 }

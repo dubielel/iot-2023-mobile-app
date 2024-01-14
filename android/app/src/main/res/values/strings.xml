@@ -4,4 +4,6 @@
     <string name="title_activity_main">IoT 2023 Mobile App</string>
     <string name="package_name">pl.edu.agh.iisi.iot.mdubiel</string>
     <string name="custom_url_scheme">pl.edu.agh.iisi.iot.mdubiel</string>
+    <string name="server_client_id">171380463934-dp4f3eeus404gvi1bpgdfqditdaqv2mj.apps.googleusercontent.com</string>
+    <string name="android_client_id">171380463934-dp4f3eeus404gvi1bpgdfqditdaqv2mj.apps.googleusercontent.com</string>
 </resources>

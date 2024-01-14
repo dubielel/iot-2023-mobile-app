@@ -24,6 +24,7 @@ import { NewDevicePage } from './pages/NewDevicePage';
 import { AddDevicePage } from './pages/AddDevicePage';
 import { ListDevicesPage } from './pages/ListDevicesPage';
 import { DeviceDetailsPage } from './pages/DeviceDetailsPage';
+import { LoginPage } from './pages/LoginPage';
 
 setupIonicReact({ mode: 'ios', swipeBackEnabled: true });
 const BACK_BUTTON_EVENT_NAME = 'ionBackButton';
@@ -48,6 +49,7 @@ export const App = () => {
   return (
     <IonRouterOutlet>
       <Route exact path="/" component={LoadingScreen} />
+      <Route path="/login" component={LoginPage} exact={true} />
       <Route path="/home" component={HomePage} />
       <Route exact path="/device/new" component={NewDevicePage} />
       <Route exact path="/device/add" component={AddDevicePage} />
