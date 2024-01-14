@@ -1,14 +1,30 @@
+import { GoogleAuth } from '@codetrix-studio/capacitor-google-auth';
 import {
   IonCard,
+  IonCardContent,
   IonCardHeader,
   IonCardTitle,
   IonContent,
   IonPage,
   IonRippleEffect,
 } from '@ionic/react';
-import { CSSProperties } from 'react';
+import { CSSProperties, useCallback, useState } from 'react';
+import { useUserProvider } from '../contexts/UserContext';
+import { Redirect } from 'react-router';
 
 export const HomePage = () => {
+  const [isLoggedOut, setIsLoggedOut] = useState(false);
+  const user = useUserProvider();
+
+  const signOut = useCallback(async () => {
+    await GoogleAuth.signOut();
+
+    if (user.setUser) user.setUser(undefined);
+    user.removeUserFromPreferences();
+    setIsLoggedOut(true);
+  }, [user]);
+
+  if (isLoggedOut) return <Redirect to="/login" />;
   return (
     <IonPage>
       {/* <IonHeader>
@@ -49,6 +65,21 @@ export const HomePage = () => {
               <IonCardTitle style={styles.cardTitle}>List devices</IonCardTitle>
             </IonCardHeader>
           </IonCard>
+          {user && (
+            <IonCard
+              onClick={signOut}
+              className="ion-activatable ripple-parent rounded-rectangle"
+              style={styles.card}>
+              <IonRippleEffect />
+              <IonCardHeader>
+                <IonCardTitle style={styles.cardTitle}>Log out</IonCardTitle>
+              </IonCardHeader>
+              <IonCardContent>
+                Currently logged in user:{' '}
+                {`${user.user?.givenName} ${user.user?.familyName}`}
+              </IonCardContent>
+            </IonCard>
+          )}
         </div>
       </IonContent>
     </IonPage>
@@ -71,6 +102,7 @@ const styles = {
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
+    flexDirection: 'column',
   },
   cardTitle: {
     textAlign: 'center',

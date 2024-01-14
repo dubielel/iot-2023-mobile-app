@@ -2,9 +2,12 @@ import { GoogleAuth } from '@codetrix-studio/capacitor-google-auth';
 import { IonContent, IonSpinner } from '@ionic/react';
 import { useState, useCallback, useEffect, CSSProperties } from 'react';
 import { Redirect } from 'react-router';
+import { useUserProvider } from './contexts/UserContext';
 
 export const LoadingScreen = () => {
+  const user = useUserProvider();
   const [isLoaded, setLoaded] = useState(false);
+  const [isUser, setIsUser] = useState(false);
 
   const deviceReadyCallback = useCallback(() => {
     requestAnimationFrame(async () => {
@@ -15,8 +18,26 @@ export const LoadingScreen = () => {
         scopes: ['profile', 'email'],
         grantOfflineAccess: true,
       });
+      const savedUser = await user.getUserFromPreferences();
+      if (savedUser) {
+        const refreshedTokens = await GoogleAuth.refresh();
+
+        if (!user.setUser) {
+          console.error('we dont have setuser');
+          return;
+        }
+
+        user.setUser({
+          ...savedUser,
+          authentication: refreshedTokens,
+        });
+        setIsUser(true);
+      }
       setLoaded(true);
     });
+    // empty dependency array on purpose cause I update user inside
+    // so it will trigger the callback for the second time
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -32,7 +53,8 @@ export const LoadingScreen = () => {
       document.removeEventListener('deviceready', deviceReadyCallback);
   }, [deviceReadyCallback, isLoaded]);
 
-  if (isLoaded) return <Redirect to="/login" />;
+  if (isLoaded && !isUser) return <Redirect to="/login" />;
+  if (isLoaded && isUser) return <Redirect to="/home" />;
   return (
     <IonContent>
       <div style={styles.container}>
