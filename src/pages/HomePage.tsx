@@ -75,8 +75,7 @@ export const HomePage = () => {
                 <IonCardTitle style={styles.cardTitle}>Log out</IonCardTitle>
               </IonCardHeader>
               <IonCardContent>
-                Currently logged in user:{' '}
-                {`${user.user?.givenName} ${user.user?.familyName}`}
+                Currently logged in user: {user.user?.name}
               </IonCardContent>
             </IonCard>
           )}
