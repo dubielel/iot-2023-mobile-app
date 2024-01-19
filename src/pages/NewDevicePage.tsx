@@ -10,24 +10,21 @@ import {
   IonPage,
   useIonAlert,
 } from '@ionic/react';
-import { useEffect, useState } from 'react';
-import {
-  WifiSecurityProtocol,
-  WifiSecurityProtocolMapForWifiWizard,
-} from '../utils/WifiSecurityProtocol';
+import { useCallback, useContext, useEffect, useState } from 'react';
+
 import { checkmarkOutline } from 'ionicons/icons';
-import { IonLabelRight } from '../components/helpers/IonLabelRight';
-import { WifiWizard2 } from '@awesome-cordova-plugins/wifi-wizard-2';
+
 import { useHistory } from 'react-router';
 import { ConnectionType } from '@capacitor/network';
 import { checkNetworkStatus } from '../utils/checkNetworkStatus';
+import { Browser } from '@capacitor/browser';
+import { Spinner } from '../components/Spinner';
 import { WaitToConfigureDeviceModal } from '../components/modals/WaitToConfigureDeviceModal';
-import {
-  GetWifiConfigurationModal,
-  WifiDataForm,
-} from '../components/modals/GetWifiConfigurationModal';
-
-type WifiConfig = Omit<WifiDataForm, 'BSSID'>;
+import { WifiWizard2 } from '@awesome-cordova-plugins/wifi-wizard-2';
+import UserContext from '../contexts/UserContext';
+import { io } from 'socket.io-client';
+import { encryptAESCTR } from '../utils/encryptAESCTR';
+import { DeviceEncryptionAESKey } from '../constants/DeviceEncryptionAESKey';
 
 export type FoundWifiDetails = {
   BSSID: string;
@@ -49,6 +46,9 @@ type DeviceConfig = {
 };
 
 export const NewDevicePage = () => {
+  const user = useContext(UserContext);
+
+  // Check internet connection
   const [currentINetConnType, setCurrentINetConnType] =
     useState<ConnectionType>('unknown');
   const [currentINetConnSSID, setCurrentINetConnSSID] = useState<
@@ -89,50 +89,100 @@ export const NewDevicePage = () => {
     history,
     currentINetConnType,
   ]);
+  // Check internet connection end
 
-  const [isGetWifiConfigurationModalOpen, setIsGetWifiConfigurationModalOpen] =
-    useState(false);
-
-  const [isLoadingWifis, setIsLoadingWifis] = useState<boolean | null>(null);
-  const [availableWifis, setAvailableWifis] = useState<FoundWifiDetails[]>([]);
-
-  const [selectedWifi, setSelectedWifi] = useState<WifiConfig>({
-    SSID: '',
-    algorithm: WifiSecurityProtocol.None,
-    password: '',
-  });
+  const [userRemembersWifi, setUserRemembersWifi] = useState<boolean>(false);
 
   const [enabledAPN, setEnabledAPN] = useState<boolean>(false);
 
-  // GET request to Azure to ask for new device configuration data (key)
-  const [deviceConfig, setDeviceConfig] = useState<DeviceConfig | undefined>(
-    undefined,
-  );
+  const [isLoadingAPNui, setIsLoadingAPNui] = useState<boolean>(false);
 
-  const [isConfiguringDeviceCompleted, setIsConfiguringDeviceCompleted] =
+  const [userProvidedWifiToDevice, setUserProvidedWifiToDevice] =
+    useState<boolean>(false);
+
+  // GET request to Azure to ask for new device configuration data (key)
+  const [deviceConfigEncrypted, setDeviceConfigEncrypted] =
+    useState<Uint8Array>(new Uint8Array());
+
+  const [isConfiguringDevice, setIsConfiguringDevice] =
     useState<boolean>(false);
 
   useEffect(() => {
     if (!enabledAPN) return;
 
     // Connect to device's APN -- hardcoded configuration
-    // TODO for mock purposes we connect to provided WIFI configuration
-    WifiWizard2.connect(
-      selectedWifi.SSID,
-      true,
-      selectedWifi.password,
-      WifiSecurityProtocolMapForWifiWizard[selectedWifi.algorithm],
-    )
-      .then(v => console.debug(v))
-      .catch(e => console.error(e));
+    const openCapacitorSite = async () => {
+      await new Promise(r => setTimeout(r, 2000));
+      // Get new device configuration from Azure
+      // const data = await fetch(
+      //   'https://iot-project-agh-bcdgl.azurewebsites.net/api/add-device',
+      //   {
+      //     headers: {
+      //       Authorization: `Bearer ${user?.user?.authentication.accessToken}`,
+      //       'x-functions-key':
+      //         'iNjJu8MziIYZumeq3ZUY1Wc4xvBcD240Kj7xrXt0qcvQAzFudlnkyw==',
+      //     },
+      //   },
+      // );
+      // const newDeviceConfig = (await data.json()) as DeviceConfig;
+      // const encryptedDeviceConfig = encryptAESCTR(
+      //   `${newDeviceConfig.deviceId},${newDeviceConfig.primaryKey}`,
+      //   DeviceEncryptionAESKey,
+      // );
+      // setDeviceConfigEncrypted(encryptedDeviceConfig);
+
+      // Connect to device's APN
+      // await WifiWizard2.connect('http://192.168.SOMETHING', true);
+
+      // Open device's APN login to network page
+      await Browser.open({ url: 'http://capacitorjs.com/' });
+    };
+
+    setIsLoadingAPNui(true);
+    openCapacitorSite().then(() => setIsLoadingAPNui(false));
 
     // Send POST request with provided WIFI configuration to device
     // and wait for device's response that request was successful
     // and for device's data
 
     // Switch from device's APN to 'main' network
-  }, [enabledAPN, selectedWifi]);
+  }, [enabledAPN]);
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const tcp = useCallback(async (toSend: Uint8Array) => {
+    console.debug('in tcp');
+    const socket = io('http://192.168.SOMETHING:PORT');
+    await socket.emitWithAck('device', toSend);
+  }, []);
+
+  const onBrowserFinishedCb = useCallback(async () => {
+    setIsConfiguringDevice(true);
+    console.debug('in browserFinished listener callback');
+    await tcp(deviceConfigEncrypted);
+
+    // await WifiWizard2.disconnect('http://192.168.SOMETHING');
+
+    if (currentINetConnSSID) {
+      console.debug(`current ssid: ${currentINetConnSSID}`);
+      // await WifiWizard2.enable(currentINetConnSSID, undefined, true); // with waiting for verified connection
+    } else {
+      // Timeout just to be sure that device switches to cellular network and establishes connection
+      await new Promise(r => setTimeout(r, 3000));
+    }
+
+    Browser.removeAllListeners();
+    await new Promise(r => setTimeout(r, 10000));
+    setIsConfiguringDevice(false);
+  }, [currentINetConnSSID, deviceConfigEncrypted, tcp]);
+
+  useEffect(() => {
+    Browser.removeAllListeners().then(() =>
+      Browser.addListener('browserFinished', onBrowserFinishedCb),
+    );
+  }, [onBrowserFinishedCb]);
+
+  // if (isLoadingAPNui) return <Spinner />;
+  if (!user) return <IonNote>User must be logged in!</IonNote>;
   return (
     <IonPage>
       <IonContent fullscreen>
@@ -140,13 +190,12 @@ export const NewDevicePage = () => {
           <IonNote>Steps to configure new device:</IonNote>
           <IonItem>
             <IonLabel color="dark">
-              1. Provide WIFI network configuration to be sent to the device
+              1. Remind yourself your WIFI network configuration (SSID,
+              password) that you want your new device to use.
             </IonLabel>
-            {selectedWifi.SSID === '' ? (
-              <IonButton
-                slot="end"
-                onClick={() => setIsGetWifiConfigurationModalOpen(true)}>
-                Let&apos;s do it!
+            {!userRemembersWifi ? (
+              <IonButton slot="end" onClick={() => setUserRemembersWifi(true)}>
+                I have it now!
               </IonButton>
             ) : (
               <IonBadge color="success">
@@ -154,43 +203,32 @@ export const NewDevicePage = () => {
               </IonBadge>
             )}
           </IonItem>
-          {!(selectedWifi.SSID === '') && (
-            <IonItem>
-              <div style={{ display: 'flex', flexDirection: 'column' }}>
-                <IonLabel>Provided WIFI network configuration:</IonLabel>
-                <div style={{ display: 'flex', flexDirection: 'row' }}>
-                  <IonLabel>SSID:</IonLabel>
-                  <IonLabelRight>{selectedWifi.SSID}</IonLabelRight>
-                </div>
-                <div style={{ display: 'flex', flexDirection: 'row' }}>
-                  <IonLabel>Security protocol:</IonLabel>
-                  <IonLabelRight>{selectedWifi.algorithm}</IonLabelRight>
-                </div>
-                {selectedWifi.password && (
-                  <div style={{ display: 'flex', flexDirection: 'row' }}>
-                    <IonLabel>Password length:</IonLabel>
-                    <IonLabelRight>
-                      {selectedWifi.password.length}
-                    </IonLabelRight>
-                  </div>
-                )}
-              </div>
-              <IonButton
-                slot="end"
-                onClick={() => setIsGetWifiConfigurationModalOpen(true)}
-                disabled={enabledAPN}>
-                Correct
-              </IonButton>
-            </IonItem>
-          )}
           <IonItem>
             <IonLabel color="dark">2. Click button on the device</IonLabel>
             {!enabledAPN ? (
               <IonButton
                 slot="end"
                 onClick={() => setEnabledAPN(true)}
-                disabled={selectedWifi.SSID === ''}>
-                {selectedWifi.SSID === ''
+                disabled={!userRemembersWifi}>
+                {!userRemembersWifi ? 'Do steps before!' : "I've done it!"}
+              </IonButton>
+            ) : (
+              <IonBadge color="success">
+                <IonIcon icon={checkmarkOutline} />
+              </IonBadge>
+            )}
+          </IonItem>
+          <IonItem>
+            <IonLabel color="dark">
+              3. When device page loads, insert your WIFI network configuration
+              there
+            </IonLabel>
+            {!userProvidedWifiToDevice ? (
+              <IonButton
+                slot="end"
+                onClick={() => setUserProvidedWifiToDevice(true)}
+                disabled={!(userRemembersWifi && enabledAPN)}>
+                {!(userRemembersWifi && enabledAPN)
                   ? 'Do steps before!'
                   : "I've done it!"}
               </IonButton>
@@ -202,28 +240,8 @@ export const NewDevicePage = () => {
           </IonItem>
         </IonList>
 
-        <GetWifiConfigurationModal
-          onFormSubmit={values => {
-            const { BSSID: _, ...wifiConfig } = values;
-            setSelectedWifi(wifiConfig);
-            setIsGetWifiConfigurationModalOpen(false);
-          }}
-          isOpen={isGetWifiConfigurationModalOpen}
-          defaultValues={{ ...selectedWifi, BSSID: '' }}
-          onSSIDInputHelper={ssid =>
-            availableWifis.find(wifi => wifi.SSID === ssid)
-          }
-          beforeScan={() => setIsLoadingWifis(true)}
-          onScanSuccess={wifis => {
-            setAvailableWifis(wifis);
-            setIsLoadingWifis(false);
-          }}
-          availableWifisList={availableWifis.filter(wifi => wifi.BSSID !== '')}
-          isLoadingWifis={isLoadingWifis ?? false}
-        />
-
         <WaitToConfigureDeviceModal
-          isOpen={enabledAPN && !isConfiguringDeviceCompleted}
+          isOpen={isLoadingAPNui || isConfiguringDevice}
         />
       </IonContent>
     </IonPage>
