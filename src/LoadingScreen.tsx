@@ -3,6 +3,7 @@ import { IonContent, IonSpinner } from '@ionic/react';
 import { useState, useCallback, useEffect, CSSProperties } from 'react';
 import { Redirect } from 'react-router';
 import { useUserProvider } from './contexts/UserContext';
+import { Spinner } from './components/Spinner';
 
 export const LoadingScreen = () => {
   const user = useUserProvider();
@@ -55,22 +56,5 @@ export const LoadingScreen = () => {
 
   if (isLoaded && !isUser) return <Redirect to="/login" />;
   if (isLoaded && isUser) return <Redirect to="/home" />;
-  return (
-    <IonContent>
-      <div style={styles.container}>
-        <IonSpinner style={styles.spinner} />
-      </div>
-    </IonContent>
-  );
+  return <Spinner />;
 };
-
-const styles = {
-  container: {
-    height: '100vh',
-    width: '100%',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-  } as const,
-  spinner: { width: 64, height: 64 } as const,
-} satisfies Record<string, CSSProperties>;
