@@ -1,5 +1,9 @@
 import { IonContent, IonPage, IonText } from '@ionic/react';
 import { DeviceCard } from '../components/DeviceCard';
+import useSWR, { Fetcher } from 'swr';
+import { CSSProperties, useContext } from 'react';
+import UserContext from '../contexts/UserContext';
+import { Spinner } from '../components/Spinner';
 
 const devices = [
   { name: '1', id: 1 },
@@ -16,7 +20,28 @@ const devices = [
   { name: '12', id: 12 },
 ];
 
+type Device = {
+  id: string;
+  name: string;
+  value: number;
+};
+
 export const ListDevicesPage = () => {
+  const user = useContext(UserContext);
+  const { data: deviceList, error } = useSWR<Device[], Error>(
+    'https://iot-project-agh-bcdgl.azurewebsites.net/api/device',
+    (url: string) =>
+      fetch(url, {
+        headers: {
+          Authorization: `Bearer ${user?.user?.authentication.accessToken}`,
+          'x-functions-key':
+            'iNjJu8MziIYZumeq3ZUY1Wc4xvBcD240Kj7xrXt0qcvQAzFudlnkyw==',
+        },
+      }).then(res => res.json()),
+  );
+  console.debug(`data: ${JSON.stringify(deviceList)}`);
+  console.error(`error ${error}`);
+  if (!deviceList) return <Spinner />;
   return (
     <IonPage>
       {/* <IonHeader>
@@ -28,16 +53,37 @@ export const ListDevicesPage = () => {
         </IonToolbar>
       </IonHeader> */}
       <IonContent fullscreen>
-        {devices.map(device => {
-          return (
-            <DeviceCard
-              name={device.name}
-              timestamp={1703274646}
-              temperature={18.6}
-              routerLink={`/device/details/${device.id}`}></DeviceCard>
-          );
-        })}
+        {deviceList.length === 0 ? (
+          devices.map(device => {
+            return (
+              <DeviceCard
+                key={device.id}
+                name={device.name}
+                timestamp={1703274646}
+                temperature={18.6}
+                routerLink={`/device/details/${device.id}`}></DeviceCard>
+            );
+          })
+        ) : (
+          <div style={styles.wrapper}>
+            <IonText>No devices here</IonText>
+            <IonText color="dark">
+              Configure a new device or add an existing one
+            </IonText>
+          </div>
+        )}
       </IonContent>
     </IonPage>
   );
 };
+
+const styles = {
+  wrapper: {
+    width: '100%',
+    height: '100%',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    flexDirection: 'column',
+  } as const,
+} satisfies Record<string, CSSProperties>;
