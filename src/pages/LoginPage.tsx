@@ -1,7 +1,6 @@
 import { IonPage, IonContent, IonText, IonButton } from '@ionic/react';
 import { GoogleAuth } from '@codetrix-studio/capacitor-google-auth';
 import { CSSProperties, useCallback, useEffect, useState } from 'react';
-import useSWR from 'swr';
 import { useUserProvider } from '../contexts/UserContext';
 import { Redirect } from 'react-router';
 
@@ -16,7 +15,16 @@ export const LoginPage = () => {
     user.setUserToPreferences(googleUser);
     setIsLogged(true);
 
-    // send POST to login endpoint on azure
+    // send GET to login endpoint on azure
+    fetch('https://iot-project-agh-bcdgl.azurewebsites.net/api/login', {
+      headers: {
+        Authorization: `Bearer ${googleUser.authentication.accessToken}`,
+        'x-functions-key':
+          'iNjJu8MziIYZumeq3ZUY1Wc4xvBcD240Kj7xrXt0qcvQAzFudlnkyw==',
+      },
+    })
+      .then(v => console.debug(v))
+      .catch(e => console.error(e));
   }, [user]);
 
   useEffect(() => console.debug(`user: ${JSON.stringify(user)}`), [user]);
