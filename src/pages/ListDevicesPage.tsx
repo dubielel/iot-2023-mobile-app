@@ -1,6 +1,6 @@
 import { IonContent, IonPage, IonText } from '@ionic/react';
 import { DeviceCard } from '../components/DeviceCard';
-import useSWR, { Fetcher } from 'swr';
+import useSWR from 'swr';
 import { CSSProperties, useContext } from 'react';
 import UserContext from '../contexts/UserContext';
 import { Spinner } from '../components/Spinner';
@@ -44,14 +44,6 @@ export const ListDevicesPage = () => {
   if (!deviceList) return <Spinner />;
   return (
     <IonPage>
-      {/* <IonHeader>
-        <IonToolbar>
-          <IonButtons slot="start">
-            <IonBackButton />
-          </IonButtons>
-          <IonTitle>Devices list</IonTitle>
-        </IonToolbar>
-      </IonHeader> */}
       <IonContent fullscreen>
         {deviceList.length === 0 ? (
           devices.map(device => {

@@ -32,11 +32,6 @@ export const LoginPage = () => {
   if (isLogged) return <Redirect to="/home" />;
   return (
     <IonPage>
-      {/* <IonHeader>
-        <IonToolbar>
-          <IonTitle>Cockpit</IonTitle>
-        </IonToolbar>
-      </IonHeader> */}
       <IonContent fullscreen>
         <div style={styles.wrapper}>
           <IonText>Log in with Google to enter application</IonText>

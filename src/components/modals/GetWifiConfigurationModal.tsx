@@ -14,7 +14,7 @@ import { AvailableWifiList } from '../wifi/AvailableWifiList';
 import { ScanButton, ScanButtonProps } from '../wifi/ScanButton';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { FoundWifiDetails } from '../../pages/NewDevicePage';
+import { FoundWifiDetails } from '../../pages/DEPRECATED2_NewDevicePage';
 
 const wifiDataValidationSchema = z
   .object({

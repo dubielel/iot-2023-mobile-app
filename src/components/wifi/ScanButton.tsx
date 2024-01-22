@@ -1,6 +1,6 @@
 import { IonButton } from '@ionic/react';
 import { ComponentProps, useCallback } from 'react';
-import { FoundWifiDetails } from '../../pages/NewDevicePage';
+import { FoundWifiDetails } from '../../pages/DEPRECATED2_NewDevicePage';
 import { WifiWizard2 } from '@awesome-cordova-plugins/wifi-wizard-2';
 
 export type ScanButtonProps = {

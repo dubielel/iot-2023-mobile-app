@@ -20,8 +20,7 @@ import './theme/variables.css';
 import { useCallback, useEffect } from 'react';
 import { LoadingScreen } from './LoadingScreen';
 import { HomePage } from './pages/HomePage';
-import { NewDevicePage } from './pages/NewDevicePage';
-import { AddDevicePage } from './pages/AddDevicePage';
+import { PairDevicePage } from './pages/PairDevicePage';
 import { ListDevicesPage } from './pages/ListDevicesPage';
 import { DeviceDetailsPage } from './pages/DeviceDetailsPage';
 import { LoginPage } from './pages/LoginPage';
@@ -53,8 +52,7 @@ export const App = () => {
         <Route exact path="/" component={LoadingScreen} />
         <Route path="/login" component={LoginPage} exact={true} />
         <Route path="/home" component={HomePage} />
-        <Route exact path="/device/new" component={NewDevicePage} />
-        <Route exact path="/device/add" component={AddDevicePage} />
+        <Route exact path="/device/pair" component={PairDevicePage} />
         <Route exact path="/devices" component={ListDevicesPage} />
         <Route path="/device/details/:id" component={DeviceDetailsPage} />
       </UserProvider>

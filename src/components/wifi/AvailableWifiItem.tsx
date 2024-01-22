@@ -1,6 +1,6 @@
 import { IonCheckbox, IonItem } from '@ionic/react';
 import { ComponentProps } from 'react';
-import { FoundWifiDetails } from '../../pages/NewDevicePage';
+import { FoundWifiDetails } from '../../pages/DEPRECATED2_NewDevicePage';
 import { useFormContext } from 'react-hook-form';
 import { WifiDataForm } from '../modals/GetWifiConfigurationModal';
 

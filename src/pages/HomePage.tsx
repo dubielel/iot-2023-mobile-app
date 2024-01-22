@@ -27,33 +27,15 @@ export const HomePage = () => {
   if (isLoggedOut) return <Redirect to="/login" />;
   return (
     <IonPage>
-      {/* <IonHeader>
-        <IonToolbar>
-          <IonTitle>Cockpit</IonTitle>
-        </IonToolbar>
-      </IonHeader> */}
       <IonContent fullscreen>
         <div style={styles.cardsWrapper}>
           <IonCard
-            routerLink="/device/new"
+            routerLink="/device/pair"
             className="ion-activatable ripple-parent rounded-rectangle"
             style={styles.card}>
             <IonRippleEffect />
             <IonCardHeader>
-              <IonCardTitle style={styles.cardTitle}>
-                Configure new device
-              </IonCardTitle>
-            </IonCardHeader>
-          </IonCard>
-          <IonCard
-            routerLink="/device/add"
-            className="ion-activatable ripple-parent rounded-rectangle"
-            style={styles.card}>
-            <IonRippleEffect />
-            <IonCardHeader>
-              <IonCardTitle style={styles.cardTitle}>
-                Add existing device
-              </IonCardTitle>
+              <IonCardTitle style={styles.cardTitle}>Pair device</IonCardTitle>
             </IonCardHeader>
           </IonCard>
           <IonCard

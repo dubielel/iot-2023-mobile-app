@@ -30,11 +30,6 @@ export const DeviceDetailsPage = () => {
   if (!deviceDetails) return <Spinner />;
   return (
     <IonPage>
-      {/* <IonHeader>
-        <IonToolbar>
-          <IonTitle>Cockpit</IonTitle>
-        </IonToolbar>
-      </IonHeader> */}
       <IonContent fullscreen>
         <IonText>
           DeviceDetailsPage for: {id} {deviceDetails.name}
@@ -43,34 +38,3 @@ export const DeviceDetailsPage = () => {
     </IonPage>
   );
 };
-
-// [
-//   {
-//     "route": "/devices",
-//     "type": "GET",
-//     "body": [
-//       {
-//         "id": "number",
-//         "name": "string",
-//         "lastSample": {
-//           "timestamp": "number",
-//           "temperature": "number"
-//         }
-//       }
-//     ]
-//   },
-//   {
-//     "route": "/devices/:id",
-//     "type": "GET",
-//     "body": {
-//       "id": "number",
-//       "name": "string",
-//       "samples": [
-//         {
-//           "timestamp": "number",
-//           "temperature": "number"
-//         }
-//       ]
-//     }
-//   }
-// ]
