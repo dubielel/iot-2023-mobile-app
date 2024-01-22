@@ -3,7 +3,7 @@ import { useCallback, useContext, useState } from 'react';
 import { WaitToConfigureDeviceModal } from '../components/modals/WaitToConfigureDeviceModal';
 import { io } from 'socket.io-client';
 import { decryptAESCTR } from '../utils/decryptAESCTR';
-import { environment as env } from '../../environment';
+import { environment as env } from '../../.environment';
 import UserContext from '../contexts/UserContext';
 
 export const AddDevicePage = () => {

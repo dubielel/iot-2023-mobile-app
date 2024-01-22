@@ -4,7 +4,7 @@ import useSWR from 'swr';
 import { CSSProperties, useContext } from 'react';
 import UserContext from '../contexts/UserContext';
 import { Spinner } from '../components/Spinner';
-import { environment as env } from '../../environment';
+import { environment as env } from '../../.environment';
 
 const devices = [
   { name: '1', id: 1 },

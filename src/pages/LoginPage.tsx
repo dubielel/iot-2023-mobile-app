@@ -3,7 +3,7 @@ import { GoogleAuth } from '@codetrix-studio/capacitor-google-auth';
 import { CSSProperties, useCallback, useEffect, useState } from 'react';
 import { useUserProvider } from '../contexts/UserContext';
 import { Redirect } from 'react-router';
-import { environment as env } from '../../environment';
+import { environment as env } from '../../.environment';
 
 export const LoginPage = () => {
   const [isLogged, setIsLogged] = useState(false);

@@ -1,6 +1,5 @@
 import { GoogleAuth } from '@codetrix-studio/capacitor-google-auth';
-import { IonContent, IonSpinner } from '@ionic/react';
-import { useState, useCallback, useEffect, CSSProperties } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { Redirect } from 'react-router';
 import { useUserProvider } from './contexts/UserContext';
 import { Spinner } from './components/Spinner';

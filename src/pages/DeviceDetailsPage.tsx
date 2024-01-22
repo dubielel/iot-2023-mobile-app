@@ -4,7 +4,7 @@ import { useParams } from 'react-router';
 import useSWR from 'swr';
 import UserContext from '../contexts/UserContext';
 import { Spinner } from '../components/Spinner';
-import { environment as env } from '../../environment';
+import { environment as env } from '../../.environment';
 
 type DeviceDetails = {
   id: string;
