@@ -3,6 +3,7 @@ import { useState, useCallback, useEffect } from 'react';
 import { Redirect } from 'react-router';
 import { useUserProvider } from './contexts/UserContext';
 import { Spinner } from './components/Spinner';
+import { checkNetworkStatus } from './utils/checkNetworkStatus';
 
 export const LoadingScreen = () => {
   const user = useUserProvider();
@@ -20,6 +21,14 @@ export const LoadingScreen = () => {
       });
       const savedUser = await user.getUserFromPreferences();
       if (savedUser) {
+        try {
+          await checkNetworkStatus();
+        } catch (error) {
+          console.error(error);
+          setIsUser(true);
+          setLoaded(true);
+          return;
+        }
         const refreshedTokens = await GoogleAuth.refresh();
 
         if (!user.setUser) {
