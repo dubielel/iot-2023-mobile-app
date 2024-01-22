@@ -3,6 +3,7 @@ import { GoogleAuth } from '@codetrix-studio/capacitor-google-auth';
 import { CSSProperties, useCallback, useEffect, useState } from 'react';
 import { useUserProvider } from '../contexts/UserContext';
 import { Redirect } from 'react-router';
+import { environment as env } from '../../environment';
 
 export const LoginPage = () => {
   const [isLogged, setIsLogged] = useState(false);
@@ -16,11 +17,10 @@ export const LoginPage = () => {
     setIsLogged(true);
 
     // send GET to login endpoint on azure
-    fetch('https://iot-project-agh-bcdgl.azurewebsites.net/api/login', {
+    fetch(`${env.AZURE_URL}/api/login`, {
       headers: {
         Authorization: `Bearer ${googleUser.authentication.accessToken}`,
-        'x-functions-key':
-          'iNjJu8MziIYZumeq3ZUY1Wc4xvBcD240Kj7xrXt0qcvQAzFudlnkyw==',
+        ...env.AZURE_FUNCTIONS_KEY,
       },
     })
       .then(v => console.debug(v))
@@ -28,18 +28,6 @@ export const LoginPage = () => {
   }, [user]);
 
   useEffect(() => console.debug(`user: ${JSON.stringify(user)}`), [user]);
-  // const { data, error } = useSWR(
-  //   'https://iot-project-agh-bcdgl.azurewebsites.net/.auth/login/google/callback',
-  //   url =>
-  //     fetch(url, {
-  //       headers: {
-  //         'Access-Control-Allow-Origin': '*',
-  //       },
-  //     }).then(res => res.json()),
-  // );
-
-  // if (error) return <div>Error loading data</div>;
-  // if (!data) return <div>Loading...</div>;
 
   if (isLogged) return <Redirect to="/home" />;
   return (

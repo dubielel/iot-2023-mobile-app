@@ -4,6 +4,7 @@ import useSWR, { Fetcher } from 'swr';
 import { CSSProperties, useContext } from 'react';
 import UserContext from '../contexts/UserContext';
 import { Spinner } from '../components/Spinner';
+import { environment as env } from '../../environment';
 
 const devices = [
   { name: '1', id: 1 },
@@ -29,13 +30,12 @@ type Device = {
 export const ListDevicesPage = () => {
   const user = useContext(UserContext);
   const { data: deviceList, error } = useSWR<Device[], Error>(
-    'https://iot-project-agh-bcdgl.azurewebsites.net/api/device',
+    `${env.AZURE_URL}/api/device`,
     (url: string) =>
       fetch(url, {
         headers: {
           Authorization: `Bearer ${user?.user?.authentication.accessToken}`,
-          'x-functions-key':
-            'iNjJu8MziIYZumeq3ZUY1Wc4xvBcD240Kj7xrXt0qcvQAzFudlnkyw==',
+          ...env.AZURE_FUNCTIONS_KEY,
         },
       }).then(res => res.json()),
   );
