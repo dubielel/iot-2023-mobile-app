@@ -16,6 +16,7 @@ import { checkNetworkStatus } from '../utils/checkNetworkStatus';
 import { WaitToConfigureDeviceModal } from '../components/modals/WaitToConfigureDeviceModal';
 import UserContext from '../contexts/UserContext';
 import { environment as env } from '../../.environment';
+import { encryptAESCTR } from '../utils/encryptAESCTR';
 
 export const PairDevicePage = () => {
   const user = useContext(UserContext);
@@ -77,7 +78,10 @@ export const PairDevicePage = () => {
         Authorization: `Bearer ${user?.user?.authentication.accessToken}`,
         ...env.AZURE_FUNCTIONS_KEY,
       },
-      body: JSON.stringify({ deviceId: env.DEVICE_ID }),
+      body: encryptAESCTR(
+        JSON.stringify({ RequestType: 'app', DeviceId: env.DEVICE_ID }),
+        env.AES_KEY,
+      ),
     })
       .then(async res => {
         if (res.ok) {
