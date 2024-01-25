@@ -37,31 +37,20 @@ export const DeviceDetailsPage = () => {
   const [deviceReadings, setDeviceReadings] = useState<DeviceReading[]>([]);
 
   const fetchData = useCallback(async () => {
-    await new Promise(r => setTimeout(r, 2000));
-    setDeviceReadings(
-      [
-        {
-          id: Date(),
-          _ts: new Date().getTime() / 1000,
-          value: Math.random() * 23,
-        },
-        ...deviceReadings,
-      ].sort((a, b) => b._ts - a._ts),
-    );
-    // fetch(`${env.AZURE_URL}/api/data/${id}`, {
-    //   headers: {
-    //     Authorization: `Bearer ${user?.user?.authentication.accessToken}`,
-    //     ...env.AZURE_FUNCTIONS_KEY,
-    //   },
-    // })
-    //   .then(res => {
-    //     if (res.status !== 200)
-    //       throw new Error(`HTTP error: ${res.status} ${res.statusText}`);
-    //     return res.json();
-    //   })
-    //   .then(data => setDeviceReadings(data as DeviceDetails[]))
-    //   .catch(err => setErrorMessage((err as Error).message));
-  }, [id, user?.user?.authentication.accessToken, deviceReadings]);
+    fetch(`${env.AZURE_URL}/api/data/${id}`, {
+      headers: {
+        Authorization: `Bearer ${user?.user?.authentication.accessToken}`,
+        ...env.AZURE_FUNCTIONS_KEY,
+      },
+    })
+      .then(res => {
+        if (res.status !== 200)
+          throw new Error(`HTTP error: ${res.status} ${res.statusText}`);
+        return res.json();
+      })
+      .then(data => setDeviceReadings(data as DeviceReading[]))
+      .catch(err => setErrorMessage((err as Error).message));
+  }, [id, user?.user?.authentication.accessToken]);
 
   const handleRefresh = useCallback(
     async (event: CustomEvent<RefresherEventDetail>) => {
@@ -71,9 +60,9 @@ export const DeviceDetailsPage = () => {
   );
 
   // Fetch data when mounting
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     fetchData().then(() => setIsFetched(true));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
   if (errorMessage) {
