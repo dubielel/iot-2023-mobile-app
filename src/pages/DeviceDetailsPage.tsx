@@ -4,16 +4,20 @@ import {
   IonLabel,
   IonList,
   IonPage,
-  IonText,
+  IonRefresher,
+  IonRefresherContent,
+  RefresherEventDetail,
+  useIonAlert,
 } from '@ionic/react';
-import { useContext } from 'react';
-import { useParams } from 'react-router';
-import useSWR from 'swr';
+import { useCallback, useContext, useEffect, useState } from 'react';
+import { useHistory, useParams } from 'react-router';
 import UserContext from '../contexts/UserContext';
 import { Spinner } from '../components/Spinner';
+import { DeviceLastReadingCard } from '../components/DeviceLastReadingCard';
+import { DeviceReadingDetails } from '../components/DeviceReadingDetails';
 import { environment as env } from '../../.environment';
 
-type DeviceDetails = {
+export type DeviceReading = {
   id: string;
   _ts: number;
   value: number;
@@ -21,38 +25,88 @@ type DeviceDetails = {
 
 export const DeviceDetailsPage = () => {
   const { id } = useParams<{ id: string }>();
-
   const user = useContext(UserContext);
-  const { data: deviceDetails, error } = useSWR<DeviceDetails[], Error>(
-    `${env.AZURE_URL}/api/data/${id}`,
-    (url: string) =>
-      fetch(url, {
-        headers: {
-          Authorization: `Bearer ${user?.user?.authentication.accessToken}`,
-          ...env.AZURE_FUNCTIONS_KEY,
+  const [isFetched, setIsFetched] = useState<boolean>(false);
+
+  const [errorMessage, setErrorMessage] = useState<string | undefined>(
+    undefined,
+  );
+  const [presentAlert, dismissAlert] = useIonAlert();
+  const history = useHistory();
+
+  const [deviceReadings, setDeviceReadings] = useState<DeviceReading[]>([]);
+
+  const fetchData = useCallback(async () => {
+    await new Promise(r => setTimeout(r, 2000));
+    setDeviceReadings(
+      [
+        {
+          id: Date(),
+          _ts: new Date().getTime() / 1000,
+          value: Math.random() * 23,
         },
-      }).then(res => res.json()),
+        ...deviceReadings,
+      ].sort((a, b) => b._ts - a._ts),
+    );
+    // fetch(`${env.AZURE_URL}/api/data/${id}`, {
+    //   headers: {
+    //     Authorization: `Bearer ${user?.user?.authentication.accessToken}`,
+    //     ...env.AZURE_FUNCTIONS_KEY,
+    //   },
+    // })
+    //   .then(res => {
+    //     if (res.status !== 200)
+    //       throw new Error(`HTTP error: ${res.status} ${res.statusText}`);
+    //     return res.json();
+    //   })
+    //   .then(data => setDeviceReadings(data as DeviceDetails[]))
+    //   .catch(err => setErrorMessage((err as Error).message));
+  }, [id, user?.user?.authentication.accessToken, deviceReadings]);
+
+  const handleRefresh = useCallback(
+    async (event: CustomEvent<RefresherEventDetail>) => {
+      fetchData().then(() => event.detail.complete());
+    },
+    [fetchData],
   );
 
-  if (error) console.debug('we have an error');
-  if (!deviceDetails) return <Spinner />;
+  // Fetch data when mounting
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    fetchData().then(() => setIsFetched(true));
+  }, [id]);
+
+  if (errorMessage) {
+    dismissAlert().then(() => {
+      presentAlert({
+        message: `Ups! Something went wrong while fetching the data. Please try again. Error: ${errorMessage}`,
+        buttons: [
+          {
+            text: 'OK',
+            handler: () => history.goBack(),
+          },
+        ],
+        backdropDismiss: false,
+      });
+    });
+  }
+  if (!isFetched) return <Spinner />;
   return (
     <IonPage>
-      <IonContent fullscreen>
-        <IonText>DeviceDetailsPage for: {id}</IonText>
-        <IonList>
-          {deviceDetails.map((log, index) => (
+      <IonContent fullscreen color="light">
+        <IonRefresher slot="fixed" onIonRefresh={handleRefresh}>
+          <IonRefresherContent color="light"></IonRefresherContent>
+        </IonRefresher>
+        <DeviceLastReadingCard id={id} reading={deviceReadings[0]} />
+        <IonList inset>
+          <IonItem style={{ textAlign: 'center' }}>
+            <IonLabel>
+              <h1>History readings</h1>
+            </IonLabel>
+          </IonItem>
+          {deviceReadings.map((reading, index) => (
             <IonItem key={index}>
-              <div
-                style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                }}>
-                <IonLabel>
-                  Time: {new Date(log._ts * 1000).toLocaleString()}
-                </IonLabel>
-                <IonLabel>Temperature: {log.value.toFixed(3) + '°C'}</IonLabel>
-              </div>
+              <DeviceReadingDetails reading={reading} />
             </IonItem>
           ))}
         </IonList>
