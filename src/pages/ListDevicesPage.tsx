@@ -1,13 +1,18 @@
-import { IonContent, IonPage, IonText } from '@ionic/react';
+import { IonContent, IonPage, IonText, useIonAlert } from '@ionic/react';
 import { DeviceCard } from '../components/DeviceCard';
 import useSWR from 'swr';
 import { CSSProperties, useContext } from 'react';
 import UserContext from '../contexts/UserContext';
 import { Spinner } from '../components/Spinner';
 import { environment as env } from '../../.environment';
+import { useHistory } from 'react-router';
 
 export const ListDevicesPage = () => {
   const user = useContext(UserContext);
+
+  const [presentAlert, dismissAlert] = useIonAlert();
+  const history = useHistory();
+
   const { data: deviceList, error } = useSWR<string[], Error>(
     `${env.AZURE_URL}/api/device`,
     (url: string) =>
@@ -19,7 +24,21 @@ export const ListDevicesPage = () => {
       }).then(res => res.json()),
   );
   console.debug(`data: ${JSON.stringify(deviceList)}`);
-  console.error(`error ${error}`);
+
+  if (error) {
+    dismissAlert().then(() => {
+      presentAlert({
+        message: `Ups! Something went wrong while fetching the data. Please try again. Error: ${error.message}`,
+        buttons: [
+          {
+            text: 'OK',
+            handler: () => history.goBack(),
+          },
+        ],
+        backdropDismiss: false,
+      });
+    });
+  }
   if (!deviceList) return <Spinner />;
   return (
     <IonPage>
