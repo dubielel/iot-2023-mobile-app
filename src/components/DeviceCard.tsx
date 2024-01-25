@@ -8,8 +8,6 @@ import { ComponentProps } from 'react';
 
 interface DeviceCardProps {
   name: string;
-  timestamp: number;
-  temperature: number;
 }
 
 export const DeviceCard = (
