@@ -32,7 +32,7 @@ export const LoginPage = () => {
   if (isLogged) return <Redirect to="/home" />;
   return (
     <IonPage>
-      <IonContent fullscreen>
+      <IonContent fullscreen color="light">
         <div style={styles.wrapper}>
           <IonText>Log in with Google to enter application</IonText>
           <IonButton onClick={signIn}>Log In</IonButton>

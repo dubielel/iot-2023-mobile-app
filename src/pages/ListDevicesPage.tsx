@@ -23,7 +23,7 @@ export const ListDevicesPage = () => {
   if (!deviceList) return <Spinner />;
   return (
     <IonPage>
-      <IonContent fullscreen>
+      <IonContent fullscreen color="light">
         {deviceList.length !== 0 ? (
           deviceList.map(device => {
             return (

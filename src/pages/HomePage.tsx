@@ -27,7 +27,7 @@ export const HomePage = () => {
   if (isLoggedOut) return <Redirect to="/login" />;
   return (
     <IonPage>
-      <IonContent fullscreen>
+      <IonContent fullscreen color="light">
         <div style={styles.cardsWrapper}>
           <IonCard
             routerLink="/device/pair"

@@ -130,7 +130,7 @@ export const PairDevicePage = () => {
   if (!user) return <IonNote>User must be logged in!</IonNote>;
   return (
     <IonPage>
-      <IonContent fullscreen>
+      <IonContent fullscreen color="light">
         <div style={styles.container}>
           <IonText color="dark">Click button on the device</IonText>
           {!clickedDeviceButton ? (

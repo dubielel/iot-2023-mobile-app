@@ -3,7 +3,7 @@ import { CSSProperties } from 'react';
 
 export const Spinner = () => {
   return (
-    <IonContent>
+    <IonContent color="light">
       <div style={styles.container}>
         <IonSpinner style={styles.spinner} />
       </div>
