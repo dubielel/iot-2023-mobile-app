@@ -1,6 +1,6 @@
 import { ModeOfOperation, utils, padding } from 'aes-js';
 
-export const encryptAESCTR = (toEncode: string, key: number[]): string => {
+export const encryptAESCBC = (toEncode: string, key: number[]): string => {
   const iv = new Uint8Array(16);
   for (let i = 0; i < 16; i++) {
     iv[i] = Math.floor(Math.random() * 256);

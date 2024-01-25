@@ -2,7 +2,7 @@ import { IonButton, IonContent, IonPage, IonText } from '@ionic/react';
 import { useCallback, useContext, useState } from 'react';
 import { WaitToConfigureDeviceModal } from '../components/modals/WaitToConfigureDeviceModal';
 import { io } from 'socket.io-client';
-import { decryptAESCTR } from '../utils/decryptAESCTR';
+import { decryptAESCBC } from '../utils/decryptAESCTR';
 import { environment as env } from '../../.environment';
 import UserContext from '../contexts/UserContext';
 
@@ -16,7 +16,7 @@ export const AddDevicePage = () => {
 
   const onDeviceIdObtained = useCallback(
     async (toDecode: string) => {
-      const deviceIdDecrypted = decryptAESCTR(toDecode, env.AES_KEY);
+      const deviceIdDecrypted = decryptAESCBC(toDecode, env.AES_KEY);
       setDeviceId(deviceIdDecrypted);
 
       const res = await fetch(`${env.AZURE_URL}/api/pair`, {
