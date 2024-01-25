@@ -16,6 +16,7 @@ import { Spinner } from '../components/Spinner';
 import { DeviceLastReadingCard } from '../components/DeviceLastReadingCard';
 import { DeviceReadingDetails } from '../components/DeviceReadingDetails';
 import { environment as env } from '../../.environment';
+import { decryptAESCBC } from '../utils/decryptAESCBC';
 
 export type DeviceReading = {
   id: string;
@@ -43,10 +44,13 @@ export const DeviceDetailsPage = () => {
         ...env.AZURE_FUNCTIONS_KEY,
       },
     })
-      .then(res => {
+      .then(async res => {
         if (res.status !== 200)
           throw new Error(`HTTP error: ${res.status} ${res.statusText}`);
-        return res.json();
+
+        const encryptedData = await res.text();
+        const decryptedData = decryptAESCBC(encryptedData, env.AES_KEY);
+        return JSON.parse(decryptedData);
       })
       .then(data => setDeviceReadings(data as DeviceReading[]))
       .catch(err => setErrorMessage((err as Error).message));

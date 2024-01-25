@@ -6,6 +6,7 @@ import UserContext from '../contexts/UserContext';
 import { Spinner } from '../components/Spinner';
 import { environment as env } from '../../.environment';
 import { useHistory } from 'react-router';
+import { decryptAESCBC } from '../utils/decryptAESCBC';
 
 export const ListDevicesPage = () => {
   const user = useContext(UserContext);
@@ -21,9 +22,12 @@ export const ListDevicesPage = () => {
           Authorization: `Bearer ${user?.user?.authentication.accessToken}`,
           ...env.AZURE_FUNCTIONS_KEY,
         },
-      }).then(res => res.json()),
+      }).then(async res => {
+        const encryptedData = await res.text();
+        const decryptedData = decryptAESCBC(encryptedData, env.AES_KEY);
+        return JSON.parse(decryptedData);
+      }),
   );
-  console.debug(`data: ${JSON.stringify(deviceList)}`);
 
   if (error) {
     dismissAlert().then(() => {

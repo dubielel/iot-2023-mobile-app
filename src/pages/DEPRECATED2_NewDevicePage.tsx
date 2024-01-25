@@ -23,7 +23,7 @@ import { WaitToConfigureDeviceModal } from '../components/modals/WaitToConfigure
 import { WifiWizard2 } from '@awesome-cordova-plugins/wifi-wizard-2';
 import UserContext from '../contexts/UserContext';
 import { io } from 'socket.io-client';
-import { encryptAESCBC } from '../utils/encryptAESCTR';
+import { encryptAESCBC } from '../utils/encryptAESCBC';
 import { environment as env } from '../../.environment';
 
 export type FoundWifiDetails = {

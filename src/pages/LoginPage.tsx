@@ -27,8 +27,6 @@ export const LoginPage = () => {
       .catch(e => console.error(e));
   }, [user]);
 
-  useEffect(() => console.debug(`user: ${JSON.stringify(user)}`), [user]);
-
   if (isLogged) return <Redirect to="/home" />;
   return (
     <IonPage>

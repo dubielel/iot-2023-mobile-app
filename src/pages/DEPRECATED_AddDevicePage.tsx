@@ -2,7 +2,7 @@ import { IonButton, IonContent, IonPage, IonText } from '@ionic/react';
 import { useCallback, useContext, useState } from 'react';
 import { WaitToConfigureDeviceModal } from '../components/modals/WaitToConfigureDeviceModal';
 import { io } from 'socket.io-client';
-import { decryptAESCBC } from '../utils/decryptAESCTR';
+import { decryptAESCBC } from '../utils/decryptAESCBC';
 import { environment as env } from '../../.environment';
 import UserContext from '../contexts/UserContext';
 

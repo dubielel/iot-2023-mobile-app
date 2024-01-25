@@ -16,7 +16,7 @@ import { checkNetworkStatus } from '../utils/checkNetworkStatus';
 import { WaitToConfigureDeviceModal } from '../components/modals/WaitToConfigureDeviceModal';
 import UserContext from '../contexts/UserContext';
 import { environment as env } from '../../.environment';
-import { encryptAESCBC } from '../utils/encryptAESCTR';
+import { encryptAESCBC } from '../utils/encryptAESCBC';
 
 export const PairDevicePage = () => {
   const user = useContext(UserContext);
