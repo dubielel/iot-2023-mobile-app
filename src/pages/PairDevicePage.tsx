@@ -84,11 +84,16 @@ export const PairDevicePage = () => {
       ),
     })
       .then(async res => {
-        if (res.ok) {
+        if (res.ok && res.status === 200) {
+          const message = await res.text();
+          console.debug(message);
           setIsDeviceConfigured(true);
           dismissAlert().then(() => {
             presentAlert({
-              message: `Successfully configured device!`,
+              message:
+                message === 'device properly added to user'
+                  ? `Successfully configured device!`
+                  : `Request to pair a device saved - please click button on the device to finish pairing!`,
               buttons: [
                 {
                   text: 'OK',
