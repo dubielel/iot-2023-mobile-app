@@ -13,11 +13,11 @@ export const DeviceReadingDetails = ({
     <>
       <IonLabel style={{ display: 'flex', alignItems: 'center' }}>
         <IonIcon icon={thermometerOutline} size="large" />
-        {(reading ? reading.value.toFixed(3) : '--') + '°C'}
+        {(reading ? reading.Value.toFixed(3) : '--') + '°C'}
       </IonLabel>
       <IonLabel style={{ display: 'flex', alignItems: 'center' }}>
         <IonIcon icon={time} size="large" />
-        {reading ? new Date(reading._ts * 1000).toLocaleString() : '--'}
+        {reading ? new Date(reading.Timestamp * 1000).toLocaleString() : '--'}
       </IonLabel>
     </>
   );

@@ -19,9 +19,9 @@ import { environment as env } from '../../.environment';
 import { decryptAESCBC } from '../utils/decryptAESCBC';
 
 export type DeviceReading = {
-  id: string;
-  _ts: number;
-  value: number;
+  DeviceId: string;
+  Timestamp: number;
+  Value: number;
 };
 
 export const DeviceDetailsPage = () => {
@@ -52,7 +52,13 @@ export const DeviceDetailsPage = () => {
         const decryptedData = decryptAESCBC(encryptedData, env.AES_KEY);
         return JSON.parse(decryptedData);
       })
-      .then(data => setDeviceReadings(data as DeviceReading[]))
+      .then(data => {
+        const readings = data as DeviceReading[];
+        const readingsSorted = readings.sort(
+          (a, b) => b.Timestamp - a.Timestamp,
+        );
+        setDeviceReadings(readingsSorted);
+      })
       .catch(err => setErrorMessage((err as Error).message));
   }, [id, user?.user?.authentication.accessToken]);
 
