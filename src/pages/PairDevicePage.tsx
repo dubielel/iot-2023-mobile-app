@@ -93,7 +93,7 @@ export const PairDevicePage = () => {
               message:
                 message === 'device properly added to user'
                   ? `Successfully configured device!`
-                  : `Request to pair a device saved - please click button on the device to finish pairing!`,
+                  : `Request to pair a device saved - please wait until the device finishes pairing!`,
               buttons: [
                 {
                   text: 'OK',
@@ -112,9 +112,28 @@ export const PairDevicePage = () => {
       })
       .catch(err => {
         console.error(err);
+        if ((err as Error).message.startsWith('409')) {
+          setIsDeviceConfigured(true);
+          dismissAlert().then(() => {
+            presentAlert({
+              message: `Device already paired with the user!`,
+              buttons: [
+                {
+                  text: 'OK',
+                  handler: () => {
+                    dismissAlert();
+                    history.goBack();
+                  },
+                },
+              ],
+              backdropDismiss: false,
+            });
+          });
+          return;
+        }
         dismissAlert().then(() => {
           presentAlert({
-            message: `Configuring device failed! Click button on the device and confirm it in app to try again. Error message: ${
+            message: `Configuring device failed! Please try again. Error message: ${
               (err as Error).message
             }`,
             buttons: [
@@ -137,7 +156,10 @@ export const PairDevicePage = () => {
     <IonPage>
       <IonContent fullscreen color="light">
         <div style={styles.container}>
-          <IonText color="dark">Click button on the device</IonText>
+          <IonText color="dark" style={{ textAlign: 'center' }}>
+            Hold the touchscreen on the device until text changes to
+            &quot;Pairing&quot;
+          </IonText>
           {!clickedDeviceButton ? (
             <IonButton
               slot="end"

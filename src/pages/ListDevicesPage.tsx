@@ -59,9 +59,7 @@ export const ListDevicesPage = () => {
         ) : (
           <div style={styles.wrapper}>
             <IonText>No devices here</IonText>
-            <IonText color="dark">
-              Configure a new device or add an existing one
-            </IonText>
+            <IonText>Pair with a new device</IonText>
           </div>
         )}
       </IonContent>
